@@ -1,0 +1,1680 @@
+{
+	"info": {
+		"_postman_id": "dd2630dd-5733-4754-bd65-a631ed6df8f4",
+		"name": "Marketplace API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39553962"
+	},
+	"item": [
+		{
+			"name": "User Registration",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    const requestBody = JSON.parse(pm.request.body.raw);",
+							"    pm.environment.set(\"userEmail\", requestBody.email);",
+							"    pm.environment.set(\"userPassword\", requestBody.password);",
+							"}",
+							"",
+							"pm.test('Response status code is 201', function () {",
+							"    pm.expect(pm.response.code).to.equal(201);",
+							"})",
+							"",
+							"pm.test('Response time is less than 200ms', function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"{{$randomPassword}}\",\n  \"username\": \"{{$randomFirstName}}\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/auth/register",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {",
+							"    const responseData = pm.response.json();",
+							"    pm.environment.set(\"userToken\", responseData.token);",
+							"}",
+							"",
+							"",
+							"",
+							"pm.test('Response status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"})",
+							"",
+							"pm.test('User object should exist and have required properties', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.user).to.exist;",
+							"    pm.expect(responseData.user.id).to.be.a('number');",
+							"    pm.expect(responseData.user.username).to.be.a('string');",
+							"    pm.expect(responseData.user.email).to.be.a('string');",
+							"})",
+							"",
+							"pm.test('Token is a non-empty string', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData.token).to.be.a('string').and.to.have.lengthOf.at.least(1, 'Token should not be empty');",
+							"})",
+							"",
+							"pm.test('Email is in a valid format', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData.user.email).to.be.a('string').and.to.match(/^.+@.+\\..+$/);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{userPassword}}\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/auth/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Edit User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {",
+							"    const responseData = pm.response.json();",
+							"    pm.environment.set(\"userId\", responseData.user.id);",
+							"    pm.environment.set(\"userEmail\", responseData.user.email);",
+							"}",
+							"",
+							"pm.test('Response status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"})",
+							"",
+							"pm.test('User object should exist in the response', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.user).to.exist.and.to.be.an('object');",
+							"})",
+							"",
+							"pm.test('Email is in a valid format', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData.user.email).to.be.a('string').and.to.match(/^.+@.+\\..+$/);",
+							"})",
+							"",
+							"pm.test('CreatedAt and UpdatedAt are in a valid date format', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    if (responseData.user.createdAt) {",
+							"        pm.expect(responseData.user.createdAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z$/);",
+							"    }",
+							"    if (responseData.user.updatedAt) {",
+							"        pm.expect(responseData.user.updatedAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z$/);",
+							"    }",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{userToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{$randomEmail}}\",\n    \"username\": \"{{$randomFirstName}}\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/user/edit",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"edit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change Password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {",
+							"    const requestBody = JSON.parse(pm.request.body.raw);",
+							"    pm.environment.set(\"userPassword\", requestBody.newPassword);",
+							"}",
+							"",
+							"pm.test('Response status code is 200', function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"})",
+							"",
+							"pm.test('Message field is present in the response', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.have.property('message');",
+							"})",
+							"",
+							"pm.test('Message field is a non-empty string', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData.message).to.be.a('string').and.to.have.lengthOf.at.least(1, 'Value should not be empty');",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{userToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"currentPassword\": \"{{userPassword}}\",\n    \"newPassword\": \"{{$randomPassword}}\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/user/change-password",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"user",
+						"change-password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Ad",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const categories = {",
+							"    1: \"Electronic Devices\",",
+							"    2: \"Home Appliances\",",
+							"    3: \"Furniture\",",
+							"    4: \"Clothing\",",
+							"    5: \"Footwear\",",
+							"    6: \"Books\",",
+							"    7: \"Toys\",",
+							"    8: \"Sports Equipment\",",
+							"    9: \"Automotive\",",
+							"    10: \"Gardening\"",
+							"};",
+							"",
+							"const randomCategoryId = Math.min(Math.floor(Math.random() * 10) + 1, 10);",
+							"pm.environment.set(\"categoryId\", randomCategoryId);",
+							"",
+							"const descriptions = [",
+							"    \"Excellent quality, convenience, and durability.\",",
+							"    \"Ideal for everyday use.\",",
+							"    \"High-quality materials ensure a long service life.\",",
+							"    \"Versatile product for various needs.\",",
+							"    \"Easy to use and clean.\",",
+							"    \"Very popular among customers.\",",
+							"    \"Modern design that will enhance your home.\",",
+							"    \"Lightweight, compact, and easy to transport.\",",
+							"    \"Simple and convenient to use.\",",
+							"    \"A great choice for a gift.\",",
+							"    \"Made with modern quality standards in mind.\",",
+							"    \"Perfect balance of price and quality.\",",
+							"    \"Ideal for the whole family.\",",
+							"    \"Easily fits into any interior.\",",
+							"    \"The product meets all your requirements.\",",
+							"    \"Durability and comfort are guaranteed.\",",
+							"    \"Compact yet functional.\",",
+							"    \"The best choice in its class.\",",
+							"    \"Sturdy and resistant to external influences.\",",
+							"    \"Designed for your comfort.\",",
+							"    \"Ergonomic design and excellent functionality.\",",
+							"    \"Classic style suitable for any interior.\",",
+							"    \"Requires minimal maintenance.\",",
+							"    \"Great for both home and office use.\",",
+							"    \"Suitable for beginners and professionals.\",",
+							"    \"High quality at an affordable price.\",",
+							"    \"Can be used in any conditions.\",",
+							"    \"Compact size and easy to install.\",",
+							"    \"Safe and environmentally friendly product.\",",
+							"    \"Intended for daily use.\"",
+							"];",
+							"",
+							"const randomDescription = descriptions[Math.floor(Math.random() * descriptions.length)];",
+							"pm.environment.set(\"description\", randomDescription);",
+							"",
+							"const titles = {",
+							"    1: [\"Sell smartphone\", \"Sell tablet\", \"Sell laptop\", \"Sell headphones\", \"Sell camera\"],",
+							"    2: [\"Sell refrigerator\", \"Sell washing machine\", \"Sell microwave\", \"Sell vacuum cleaner\", \"Sell stove\"],",
+							"    3: [\"Sell sofa\", \"Sell armchair\", \"Sell wardrobe\", \"Sell bed\", \"Sell table\"],",
+							"    4: [\"Sell shirt\", \"Sell jeans\", \"Sell jacket\", \"Sell t-shirt\", \"Sell coat\"],",
+							"    5: [\"Sell sneakers\", \"Sell boots\", \"Sell shoes\", \"Sell sandals\", \"Sell high boots\"],",
+							"    6: [\"Sell novel\", \"Sell textbook\", \"Sell encyclopedia\", \"Sell cookbook\", \"Sell comic book\"],",
+							"    7: [\"Sell doll\", \"Sell building blocks\", \"Sell ball\", \"Sell board game\", \"Sell toy car\"],",
+							"    8: [\"Sell dumbbells\", \"Sell exercise bike\", \"Sell fitness ball\", \"Sell jump rope\", \"Sell racket\"],",
+							"    9: [\"Sell car compressor\", \"Sell GPS navigator\", \"Sell car cover\", \"Sell dashcam\", \"Sell car charger\"],",
+							"    10: [\"Sell lawn mower\", \"Sell watering can\", \"Sell garden hose\", \"Sell shovel\", \"Sell pruning shears\"]",
+							"};",
+							"",
+							"function getRandomTitle(categoryId) {",
+							"    const categoryTitles = titles[categoryId];",
+							"    return categoryTitles ? categoryTitles[Math.floor(Math.random() * categoryTitles.length)] : \"Продам товар\";",
+							"}",
+							"",
+							"const randomTitle = getRandomTitle(randomCategoryId);",
+							"if (randomTitle) {",
+							"    pm.environment.set(\"title\", randomTitle);",
+							"}",
+							"",
+							"const randomPrice = (Math.random() * (1000 - 10) + 10).toFixed(2); ",
+							"pm.environment.set(\"price\", randomPrice);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 201) {",
+							"    const responseData = pm.response.json();",
+							"    pm.environment.set(\"adId\", responseData.ad.id);",
+							"}",
+							"",
+							"pm.test('Response status code is 201', function () {",
+							"    pm.expect(pm.response.code).to.equal(201);",
+							"})",
+							"",
+							"pm.test('Ad object is present in the response', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.ad).to.exist;",
+							"})",
+							"",
+							"pm.test('Title and description must be non-empty strings', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.ad.title).to.be.a('string').and.to.have.lengthOf.at.least(1, 'Title should not be empty');",
+							"    pm.expect(responseData.ad.description).to.be.a('string').and.to.have.lengthOf.at.least(1, 'Description should not be empty');",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{userToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"{{title}}\",               \n    \"description\": \"{{description}}\",  \n    \"categoryId\": {{categoryId}},    \n    \"price\": \"{{price}}\"              \n}\n\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/ads/create",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"ads",
+						"create"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "My Ads",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test('Response status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"})",
+							"",
+							"pm.test('Verify that the response contains the required fields', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('array');",
+							"    responseData.forEach(function (ad) {",
+							"        pm.expect(ad).to.have.property('id');",
+							"        pm.expect(ad).to.have.property('userId');",
+							"        pm.expect(ad).to.have.property('title');",
+							"        pm.expect(ad).to.have.property('description');",
+							"        pm.expect(ad).to.have.property('categoryId');",
+							"        pm.expect(ad).to.have.property('price');",
+							"        pm.expect(ad).to.have.property('isSold');",
+							"        pm.expect(ad).to.have.property('createdAt');",
+							"        pm.expect(ad).to.have.property('updatedAt');",
+							"        pm.expect(ad).to.have.property('Category');",
+							"    });",
+							"})",
+							"",
+							"pm.test('Price is in a valid format', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('array');",
+							"    responseData.forEach(function (ad) {",
+							"        pm.expect(ad.price).to.match(/^\\d+(\\.\\d{1,2})?$/);",
+							"    });",
+							"})",
+							"",
+							"pm.test('Category object contains required fields - id and name', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('array');",
+							"    responseData.forEach(function (ad) {",
+							"        pm.expect(ad.Category).to.be.an('object');",
+							"        pm.expect(ad.Category.id).to.exist;",
+							"        pm.expect(ad.Category.name).to.exist;",
+							"    });",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{userToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/ads/my-ads",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"ads",
+						"my-ads"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search By Title",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test('Response status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"})",
+							"",
+							"pm.test('Validate the response array structure and its elements', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('array').that.is.not.empty;",
+							"    responseData.forEach(function (item) {",
+							"        pm.expect(item).to.be.an('object');",
+							"        pm.expect(item).to.have.property('id');",
+							"        pm.expect(item).to.have.property('userId');",
+							"        pm.expect(item).to.have.property('title');",
+							"        pm.expect(item).to.have.property('description');",
+							"        pm.expect(item).to.have.property('categoryId');",
+							"        pm.expect(item).to.have.property('price');",
+							"        pm.expect(item).to.have.property('isSold');",
+							"        pm.expect(item).to.have.property('createdAt');",
+							"        pm.expect(item).to.have.property('updatedAt');",
+							"        pm.expect(item.User).to.be.an('object');",
+							"        pm.expect(item.User).to.have.property('id');",
+							"        pm.expect(item.User).to.have.property('username');",
+							"        pm.expect(item.Category).to.be.an('object');",
+							"        pm.expect(item.Category).to.have.property('id');",
+							"        pm.expect(item.Category).to.have.property('name');",
+							"    });",
+							"})",
+							"",
+							"pm.test('Title and description should be non-empty strings', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('array');",
+							"    responseData.forEach(function (ad) {",
+							"        pm.expect(ad.title).to.be.a('string').and.to.have.lengthOf.at.least(1, 'Title should not be empty');",
+							"        pm.expect(ad.description).to.be.a('string').and.to.have.lengthOf.at.least(1, 'Description should not be empty');",
+							"    });",
+							"})",
+							"",
+							"pm.test('CreatedAt and updatedAt are in valid date format', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('array');",
+							"    responseData.forEach(function (ad) {",
+							"        pm.expect(ad.createdAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/, 'CreatedAt should be in valid date format');",
+							"        pm.expect(ad.updatedAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/, 'UpdatedAt should be in valid date format');",
+							"    });",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{userToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/ads/search?title={{title}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"ads",
+						"search"
+					],
+					"query": [
+						{
+							"key": "title",
+							"value": "{{title}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search By Category",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Response status code is 200\", function () {",
+							"  pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response has the required fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('array');",
+							"    ",
+							"    responseData.forEach(function(ad) {",
+							"        pm.expect(ad).to.include.all.keys('id', 'userId', 'title', 'description', 'categoryId', 'price', 'isSold', 'createdAt', 'updatedAt', 'User', 'Category');",
+							"    });",
+							"});",
+							"",
+							"",
+							"pm.test(\"Validate the User object\", function () {",
+							"  const responseData = pm.response.json();",
+							"  ",
+							"  pm.expect(responseData).to.be.an('array');",
+							"  responseData.forEach(function(ad) {",
+							"    pm.expect(ad.User).to.be.an('object');",
+							"    pm.expect(ad.User.id).to.exist.and.to.be.a('number');",
+							"    pm.expect(ad.User.username).to.exist.and.to.be.a('string');",
+							"  });",
+							"});",
+							"",
+							"",
+							"pm.test(\"Price is in a valid format\", function () {",
+							"  const responseData = pm.response.json();",
+							"  ",
+							"  responseData.forEach(function(ad) {",
+							"    pm.expect(ad.price).to.match(/^\\d+(\\.\\d{1,2})?$/, \"Price should be in a valid format\");",
+							"  });",
+							"});",
+							"",
+							"",
+							"pm.test(\"Category object is present and contains expected fields\", function () {",
+							"    const responseData = pm.response.json();",
+							"",
+							"    pm.expect(responseData).to.be.an('array').that.is.not.empty;",
+							"",
+							"    responseData.forEach(function(ad) {",
+							"        pm.expect(ad.Category).to.exist;",
+							"        pm.expect(ad.Category).to.have.property('id');",
+							"        pm.expect(ad.Category).to.have.property('name');",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{userToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/ads/search?categoryId={{categoryId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"ads",
+						"search"
+					],
+					"query": [
+						{
+							"key": "categoryId",
+							"value": "{{categoryId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search By Min Price",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test('Response status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"})",
+							"",
+							"pm.test('Validate the structure of the response object', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('array');",
+							"    responseData.forEach(function (ad) {",
+							"        pm.expect(ad).to.be.an('object');",
+							"        pm.expect(ad).to.have.property('id');",
+							"        pm.expect(ad).to.have.property('userId');",
+							"        pm.expect(ad).to.have.property('title');",
+							"        pm.expect(ad).to.have.property('description');",
+							"        pm.expect(ad).to.have.property('categoryId');",
+							"        pm.expect(ad).to.have.property('price');",
+							"        pm.expect(ad).to.have.property('isSold');",
+							"        pm.expect(ad).to.have.property('createdAt');",
+							"        pm.expect(ad).to.have.property('updatedAt');",
+							"        pm.expect(ad).to.have.property('User');",
+							"        pm.expect(ad.User).to.have.property('id');",
+							"        pm.expect(ad.User).to.have.property('username');",
+							"        pm.expect(ad).to.have.property('Category');",
+							"        pm.expect(ad.Category).to.have.property('id');",
+							"        pm.expect(ad.Category).to.have.property('name');",
+							"    });",
+							"})",
+							"",
+							"pm.test('Price is in a valid format', function () {",
+							"    const responseData = pm.response.json();",
+							"    responseData.forEach(ad => {",
+							"        pm.expect(ad.price).to.match(/^\\d+(\\.\\d{1,2})?$/);",
+							"    });",
+							"})",
+							"",
+							"pm.test('User and Category objects are present with expected properties', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('array').that.is.not.empty;",
+							"    responseData.forEach(function (ad) {",
+							"        pm.expect(ad.User).to.exist.and.to.be.an('object');",
+							"        pm.expect(ad.User.id).to.exist.and.to.be.a('number');",
+							"        pm.expect(ad.User.username).to.exist.and.to.be.a('string');",
+							"        pm.expect(ad.Category).to.exist.and.to.be.an('object');",
+							"        pm.expect(ad.Category.id).to.exist.and.to.be.a('number');",
+							"        pm.expect(ad.Category.name).to.exist.and.to.be.a('string');",
+							"    });",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{userToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/ads/search?minPrice={{$randomPrice}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"ads",
+						"search"
+					],
+					"query": [
+						{
+							"key": "minPrice",
+							"value": "{{$randomPrice}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search By Max Price",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test('Response status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"})",
+							"",
+							"pm.test('Validate the ad object', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('array');",
+							"    responseData.forEach(function (ad) {",
+							"        pm.expect(ad).to.be.an('object');",
+							"        pm.expect(ad.id).to.be.a('number');",
+							"        pm.expect(ad.userId).to.be.a('number');",
+							"        pm.expect(ad.title).to.be.a('string');",
+							"        pm.expect(ad.description).to.be.a('string');",
+							"        pm.expect(ad.categoryId).to.be.a('number');",
+							"        pm.expect(ad.price).to.be.a('string');",
+							"        pm.expect(ad.isSold).to.be.a('boolean');",
+							"        pm.expect(ad.createdAt).to.be.a('string');",
+							"        pm.expect(ad.updatedAt).to.be.a('string');",
+							"        pm.expect(ad.User).to.be.an('object');",
+							"        pm.expect(ad.User.id).to.be.a('number');",
+							"        pm.expect(ad.User.username).to.be.a('string');",
+							"        pm.expect(ad.Category).to.be.an('object');",
+							"        pm.expect(ad.Category.id).to.be.a('number');",
+							"        pm.expect(ad.Category.name).to.be.a('string');",
+							"    });",
+							"})",
+							"",
+							"pm.test('Price is in a valid format', function () {",
+							"    const responseData = pm.response.json();",
+							"    responseData.forEach(function (ad) {",
+							"        pm.expect(ad.price).to.match(/^\\d+(\\.\\d{1,2})?$/);",
+							"    });",
+							"})",
+							"",
+							"pm.test('User and Category objects are present and contain expected properties', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('array').that.is.not.empty;",
+							"    responseData.forEach(function (ad) {",
+							"        pm.expect(ad.User).to.exist;",
+							"        pm.expect(ad.User).to.be.an('object').that.has.property('id');",
+							"        pm.expect(ad.User).to.have.property('username');",
+							"        pm.expect(ad.Category).to.exist;",
+							"        pm.expect(ad.Category).to.be.an('object').that.has.property('id');",
+							"        pm.expect(ad.Category).to.have.property('name');",
+							"    });",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{userToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/ads/search?maxPrice={{$randomPrice}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"ads",
+						"search"
+					],
+					"query": [
+						{
+							"key": "maxPrice",
+							"value": "{{$randomPrice}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search By",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test('Response status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"})",
+							"",
+							"pm.test('Id and userId fields must exist in the response', function () {",
+							"    const responseData = pm.response.json();",
+							"    responseData.forEach(function (ad) {",
+							"        pm.expect(ad).to.have.property('id');",
+							"        pm.expect(ad).to.have.property('userId');",
+							"    });",
+							"})",
+							"",
+							"pm.test('Title and description are non-empty strings', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('array');",
+							"    responseData.forEach(function (ad) {",
+							"        pm.expect(ad.title).to.be.a('string').and.to.have.lengthOf.at.least(1, 'Title should not be empty');",
+							"        pm.expect(ad.description).to.be.a('string').and.to.have.lengthOf.at.least(1, 'Description should not be empty');",
+							"    });",
+							"})",
+							"",
+							"pm.test('IsSold is a boolean value', function () {",
+							"    const responseData = pm.response.json();",
+							"    responseData.forEach(function (ad) {",
+							"        pm.expect(ad.isSold).to.be.a('boolean');",
+							"    });",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{userToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/ads/search",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"ads",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All Ads",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test('Response status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"})",
+							"",
+							"pm.test('Validate the ad object', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('array');",
+							"    responseData.forEach(function (ad) {",
+							"        pm.expect(ad).to.be.an('object');",
+							"        pm.expect(ad.id).to.be.a('number');",
+							"        pm.expect(ad.userId).to.be.a('number');",
+							"        pm.expect(ad.title).to.be.a('string');",
+							"        pm.expect(ad.description).to.be.a('string');",
+							"        pm.expect(ad.categoryId).to.be.a('number');",
+							"        pm.expect(ad.price).to.be.a('string');",
+							"        pm.expect(ad.isSold).to.be.a('boolean');",
+							"        pm.expect(ad.createdAt).to.be.a('string');",
+							"        pm.expect(ad.updatedAt).to.be.a('string');",
+							"        pm.expect(ad.User).to.be.an('object');",
+							"        pm.expect(ad.User.id).to.be.a('number');",
+							"        pm.expect(ad.User.username).to.be.a('string');",
+							"        pm.expect(ad.Category).to.be.an('object');",
+							"        pm.expect(ad.Category.id).to.be.a('number');",
+							"        pm.expect(ad.Category.name).to.be.a('string');",
+							"    });",
+							"})",
+							"",
+							"pm.test('Price is in a valid format', function () {",
+							"    const responseData = pm.response.json();",
+							"    responseData.forEach(function (ad) {",
+							"        pm.expect(ad.price).to.match(/^\\d+(\\.\\d{1,2})?$/);",
+							"    });",
+							"})",
+							"",
+							"pm.test('CreatedAt and UpdatedAt fields are in valid date format', function () {",
+							"    const responseData = pm.response.json();",
+							"    responseData.forEach(function (ad) {",
+							"        pm.expect(ad.createdAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/, 'Invalid createdAt format');",
+							"        pm.expect(ad.updatedAt).to.match(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.\\d{3}Z$/, 'Invalid updatedAt format');",
+							"    });",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{userToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/ads/all",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"ads",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Ads By User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test('Response status code is 200', function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{userToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/ads/user/{{$randomInt}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"ads",
+						"user",
+						"{{$randomInt}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Ad",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const maxPrice = parseFloat(pm.environment.get(\"price\"));",
+							"",
+							"const randomPrice = (Math.random() * maxPrice).toFixed(2);",
+							"",
+							"pm.environment.set(\"price\", randomPrice);",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test('Response status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"})",
+							"",
+							"pm.test('Ad object has the correct structure', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData.ad).to.be.an('object');",
+							"    pm.expect(responseData.ad).to.have.property('id').that.is.a('number');",
+							"    pm.expect(responseData.ad).to.have.property('userId').that.is.a('number');",
+							"    pm.expect(responseData.ad).to.have.property('title').that.is.a('string');",
+							"    pm.expect(responseData.ad).to.have.property('description').that.is.a('string');",
+							"    pm.expect(responseData.ad).to.have.property('categoryId').that.is.a('number');",
+							"    pm.expect(responseData.ad).to.have.property('price').that.is.a('string');",
+							"    pm.expect(responseData.ad).to.have.property('isSold').that.is.a('boolean');",
+							"    pm.expect(responseData.ad).to.have.property('createdAt').that.is.a('string');",
+							"    pm.expect(responseData.ad).to.have.property('updatedAt').that.is.a('string');",
+							"})",
+							"",
+							"pm.test('Title and description must be non-empty strings', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.ad.title).to.be.a('string').and.to.have.lengthOf.at.least(1, 'Title should not be empty');",
+							"    pm.expect(responseData.ad.description).to.be.a('string').and.to.have.lengthOf.at.least(1, 'Description should not be empty');",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{userToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"{{title}}\",               \n    \"description\": \"{{description}}\",  \n    \"categoryId\": {{categoryId}},    \n    \"price\": \"{{price}}\"              \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/ads/{{adId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"ads",
+						"{{adId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Ad",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test('Response status code is 200', function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"})",
+							"",
+							"pm.test('Response message is not empty', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData.message).to.exist.and.to.not.be.empty;",
+							"})",
+							"",
+							"pm.test('Verify that the response message is a string', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData.message).to.be.a('string');",
+							"})",
+							"",
+							"pm.test('Response message is as expected', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData.message).to.exist.and.to.be.a('string');",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{userToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/ads/{{adId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"ads",
+						"{{adId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mark Ad As Sold",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test('Response status code is 200', function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{userToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/ads/{{adId}}/sold",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"ads",
+						"{{adId}}",
+						"sold"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Send SMS",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const limit = 100;",
+							"",
+							"const randomInt100 = Math.floor(Math.random() * limit) + 1;",
+							"",
+							"pm.variables.set(\"randomInt100\", randomInt100);",
+							"",
+							"const messages = [",
+							"    \"Hello! I'm interested in your item, could you provide more details?\",",
+							"    \"Hi! Is the item still available?\",",
+							"    \"Hello! Could I know more about the item's condition?\",",
+							"    \"Greetings! I'm interested in buying; could you tell me more about it?\",",
+							"    \"Hello! Could you share the actual lifespan of the item?\",",
+							"    \"Hi! Could you clarify if there's any warranty?\",",
+							"    \"Hello! Are there any defects or damages?\",",
+							"    \"Hi! I’d like to know why you’re selling the item?\",",
+							"    \"Hello! Could you provide more photos?\",",
+							"    \"Hi! I'm interested in the price; is it negotiable?\",",
+							"    \"Hello! Could you tell me how long the item has been used?\",",
+							"    \"Hi! Can we discuss the delivery method?\",",
+							"    \"Hello! Is an exchange possible?\",",
+							"    \"Greetings! Could you confirm if the item is fully functional?\",",
+							"    \"Hello! How soon could I meet to inspect the item?\",",
+							"    \"Hi! I'm interested in your listing; is everything in working order?\",",
+							"    \"Hello! Would it be possible to pick up the item today?\",",
+							"    \"Greetings! Is the item suitable for daily use?\",",
+							"    \"Hello! Could you offer a small discount?\",",
+							"    \"Hi! Does the item work well for beginners?\",",
+							"    \"Hello! What additional accessories come with the item?\",",
+							"    \"Hi! Please confirm the item’s dimensions.\",",
+							"    \"Hello! What payment options are available?\",",
+							"    \"Greetings! Does the item come with usage instructions?\",",
+							"    \"Hello! Could you share the approximate weight of the item?\",",
+							"    \"Hi! Can I inspect the item before purchasing?\",",
+							"    \"Hello! Is it possible to pay upon receipt?\",",
+							"    \"Greetings! Is shipping to another city available?\",",
+							"    \"Hello! What is the actual price?\",",
+							"    \"Hi! Could you answer a few questions about the specifications?\"",
+							"];",
+							"",
+							"const randomMessage = messages[Math.floor(Math.random() * messages.length)];",
+							"pm.variables.set(\"content\", randomMessage);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test('Response status code is 200', function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{userToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"adId\": \"{{randomInt100}}\",\n    \"content\": \"{{content}}\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/messages/send",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"messages",
+						"send"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Read SMS By Ad's ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Response status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{userToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/messages/{{adId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"messages",
+						"{{adId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Admin Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code === 200) {",
+							"    const responseData = pm.response.json();",
+							"    pm.environment.set(\"adminToken\", responseData.token);",
+							"}",
+							"",
+							"",
+							"",
+							"pm.test(\"Response status code is 200\", function () {",
+							"  pm.expect(pm.response.code).to.equal(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response has the required fields - message and token\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.message).to.exist;",
+							"    pm.expect(responseData.token).to.exist;",
+							"});",
+							"",
+							"",
+							"pm.test(\"Token is a non-empty string\", function () {",
+							"  const responseData = pm.response.json();",
+							"  ",
+							"  pm.expect(responseData.token).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Token should not be empty\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Content-Type header is application/json\", function () {",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Message is a non-empty string\", function () {",
+							"  const responseData = pm.response.json();",
+							"  ",
+							"  pm.expect(responseData).to.be.an('object');",
+							"  pm.expect(responseData.message).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Message should not be empty\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{adminEmail}}\",\n    \"password\": \"{{adminPassword}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/admin-auth/login",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"admin-auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete User | root",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Response status code is 200', function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/admin/user/{{$randomInt}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"admin",
+						"user",
+						"{{$randomInt}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Ad | root",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Response status code is 200', function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/admin/ad/{{$randomInt}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"admin",
+						"ad",
+						"{{$randomInt}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
