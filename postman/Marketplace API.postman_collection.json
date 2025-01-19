@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "738f470b-bb74-46f5-9ec9-8ed959b56b52",
+		"_postman_id": "ffd5d31f-a124-4c56-99e6-f405d8952a90",
 		"name": "Marketplace API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "41189610"
@@ -27,7 +27,8 @@
 							"    pm.expect(pm.response.responseTime).to.be.below(200);",
 							"})"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -36,7 +37,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"{{$randomPassword}}\",\n  \"username\": \"{{$randomFirstName}}\"\n}\n",
+					"raw": "{\n    \"email\": \"{{$randomEmail}}\",\n    \"password\": \"{{$randomPassword}}\",\n    \"username\": \"{{$randomFirstName}}\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -93,7 +94,8 @@
 							"    pm.expect(responseData.user.email).to.be.a('string').and.to.match(/^.+@.+\\..+$/);",
 							"})"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -102,7 +104,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"email\": \"{{userEmail}}\",\n  \"password\": \"{{userPassword}}\"\n}\n",
+					"raw": "{\n    \"email\": \"{{userEmail}}\",\n    \"password\": \"{{userPassword}}\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -161,7 +163,8 @@
 							"    }",
 							"})"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -180,7 +183,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"{{$randomEmail}}\",\n    \"username\": \"{{$randomFirstName}}\"\n}\n",
+					"raw": "{\n    \"email\": \"{{$randomEmail}}\",\n    \"username\": \"{{$randomFirstName}}\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -226,7 +229,8 @@
 							"    pm.expect(responseData.message).to.be.a('string').and.to.have.lengthOf.at.least(1, 'Value should not be empty');",
 							"})"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -245,7 +249,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"currentPassword\": \"{{userPassword}}\",\n    \"newPassword\": \"{{$randomPassword}}\"\n}\n",
+					"raw": "{\n    \"currentPassword\": \"{{userPassword}}\",\n    \"newPassword\": \"{{$randomPassword}}\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -260,35 +264,6 @@
 					"path": [
 						"user",
 						"change-password"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create Categories",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"id\": 1,\r\n    \"name\": \"Electronic Devices\"\r\n}\r\n",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/categories",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"categories"
 					]
 				}
 			},
@@ -1142,7 +1117,8 @@
 							"    pm.expect(pm.response.code).to.equal(200);",
 							"})"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -1172,14 +1148,14 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseUrl}}/ads/user/{{$randomInt}}",
+					"raw": "{{baseUrl}}/ads/user/1",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"ads",
 						"user",
-						"{{$randomInt}}"
+						"1"
 					]
 				}
 			},
@@ -1273,124 +1249,6 @@
 			"response": []
 		},
 		{
-			"name": "Delete Ad",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"",
-							"pm.test('Response status code is 200', function () {",
-							"    pm.expect(pm.response.code).to.equal(200);",
-							"})",
-							"",
-							"pm.test('Response message is not empty', function () {",
-							"    const responseData = pm.response.json();",
-							"    pm.expect(responseData.message).to.exist.and.to.not.be.empty;",
-							"})",
-							"",
-							"pm.test('Verify that the response message is a string', function () {",
-							"    const responseData = pm.response.json();",
-							"    pm.expect(responseData.message).to.be.a('string');",
-							"})",
-							"",
-							"pm.test('Response message is as expected', function () {",
-							"    const responseData = pm.response.json();",
-							"    pm.expect(responseData.message).to.exist.and.to.be.a('string');",
-							"})"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{userToken}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/ads/{{adId}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"ads",
-						"{{adId}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Mark Ad As Sold",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"",
-							"pm.test('Response status code is 200', function () {",
-							"    pm.expect(pm.response.code).to.equal(200);",
-							"})"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{userToken}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "PATCH",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{baseUrl}}/ads/{{adId}}/sold",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"ads",
-						"{{adId}}",
-						"sold"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Send SMS",
 			"event": [
 				{
@@ -1452,7 +1310,8 @@
 							"    pm.expect(pm.response.code).to.equal(200);",
 							"})"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -1471,7 +1330,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"adId\": \"{{randomInt100}}\",\n    \"content\": \"{{content}}\"\n}\n",
+					"raw": "{\n    \"adId\": \"{{adId}}\",\n    \"content\": \"{{content}}\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1539,6 +1398,124 @@
 					],
 					"path": [
 						"messages",
+						"{{adId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mark Ad As Sold",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test('Response status code is 200', function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{userToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/ads/{{adId}}/sold",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"ads",
+						"{{adId}}",
+						"sold"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Ad",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test('Response status code is 200', function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"})",
+							"",
+							"pm.test('Response message is not empty', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData.message).to.exist.and.to.not.be.empty;",
+							"})",
+							"",
+							"pm.test('Verify that the response message is a string', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData.message).to.be.a('string');",
+							"})",
+							"",
+							"pm.test('Response message is as expected', function () {",
+							"    const responseData = pm.response.json();",
+							"    pm.expect(responseData.message).to.exist.and.to.be.a('string');",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{userToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/ads/{{adId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"ads",
 						"{{adId}}"
 					]
 				}
@@ -1622,48 +1599,6 @@
 			"response": []
 		},
 		{
-			"name": "Delete User | root",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test('Response status code is 200', function () {",
-							"    pm.expect(pm.response.code).to.equal(200);",
-							"})"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{adminToken}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "{{baseUrl}}/admin/user/{{$randomInt}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"admin",
-						"user",
-						"{{$randomInt}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Delete Ad | root",
 			"event": [
 				{
@@ -1674,7 +1609,8 @@
 							"    pm.expect(pm.response.code).to.equal(200);",
 							"})"
 						],
-						"type": "text/javascript"
+						"type": "text/javascript",
+						"packages": {}
 					}
 				}
 			],
@@ -1692,14 +1628,57 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/admin/ad/{{$randomInt}}",
+					"raw": "{{baseUrl}}/admin/ad/1",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"admin",
 						"ad",
-						"{{$randomInt}}"
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete User | root",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Response status code is 200', function () {",
+							"    pm.expect(pm.response.code).to.equal(200);",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{adminToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/admin/user/1",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"admin",
+						"user",
+						"1"
 					]
 				}
 			},
