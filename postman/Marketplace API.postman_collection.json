@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "dd2630dd-5733-4754-bd65-a631ed6df8f4",
+		"_postman_id": "738f470b-bb74-46f5-9ec9-8ed959b56b52",
 		"name": "Marketplace API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "39553962"
+		"_exporter_id": "41189610"
 	},
 	"item": [
 		{
@@ -260,6 +260,35 @@
 					"path": [
 						"user",
 						"change-password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Categories",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 1,\r\n    \"name\": \"Electronic Devices\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/categories",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"categories"
 					]
 				}
 			},

@@ -45,6 +45,6 @@ const Ad = sequelize.define('Ad', {
 });
 
 Ad.belongsTo(User, { foreignKey: 'userId', onDelete: 'CASCADE' });
-Ad.belongsTo(Category, { foreignKey: 'categoryId', onDelete: 'SET NULL' });
+Ad.belongsTo(Category, { foreignKey: 'categoryId', onDelete: 'CASCADE' });
 
 module.exports = Ad;

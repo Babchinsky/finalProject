@@ -3,11 +3,47 @@ const User = require('../models/User');
 const Category = require('../models/Category');
 const Ad = require('../models/Ad');
 
+// Ваш список категорий (ID -> название)
+const categoriesSeed = {
+    1: "Electronic Devices",
+    2: "Home Appliances",
+    3: "Furniture",
+    4: "Clothing",
+    5: "Footwear",
+    6: "Books",
+    7: "Toys",
+    8: "Sports Equipment",
+    9: "Automotive",
+    10: "Gardening"
+};
+
 exports.createAd = async (req, res) => {
     try {
         const { title, description, categoryId, price } = req.body;
         const userId = req.user.userId;
 
+        // 1. Проверяем, есть ли такая категория в базе
+        let category = await Category.findByPk(categoryId);
+
+        // 2. Если нет, но есть в нашем categoriesSeed, тогда создаём
+        if (!category && categoriesSeed[categoryId]) {
+            category = await Category.create({
+                id: categoryId,
+                name: categoriesSeed[categoryId]
+            });
+        }
+
+        // Если категория всё ещё null ― значит это либо
+        //    - categoryId не совпадает ни с одним ключом в categoriesSeed,
+        //    - или categoryId < 1 / > 10
+        // Тогда возвращаем ошибку
+        if (!category) {
+            return res.status(400).json({
+                message: `Category with id ${categoryId} is not allowed (or unknown in 'categoriesSeed')`
+            });
+        }
+
+        // 3. Создаём объявление
         const ad = await Ad.create({
             userId,
             title,
@@ -16,6 +52,7 @@ exports.createAd = async (req, res) => {
             price,
         });
 
+        // 4. Дополнительно подгружаем связанные данные
         const fullAd = await Ad.findByPk(ad.id, {
             include: [
                 { model: User, attributes: ['id', 'username', 'email'] },
@@ -25,6 +62,7 @@ exports.createAd = async (req, res) => {
 
         res.status(201).json({ message: 'Ad created successfully', ad: fullAd });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: 'Failed to create ad', error });
     }
 };

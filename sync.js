@@ -1,6 +1,12 @@
 const sequelize = require('./config/database');
 require('dotenv').config();
 
+// Подключаем модели вручную
+require('./models/User');
+require('./models/Category');
+require('./models/Ad');
+require('./models/Message');
+
 const forceSync = process.env.DB_FORCE_SYNC === 'true';
 
 async function syncModels() {
